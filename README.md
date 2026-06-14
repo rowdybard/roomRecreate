@@ -35,6 +35,39 @@ without any of these.
 | `NEXT_PUBLIC_STRIPE_FULL_KIT_URL` | "Get Full Kit — $9" opens this link | Toast: "Checkout coming soon." |
 | `NEXT_PUBLIC_SUPABASE_URL` / `..._ANON_KEY` | Hook point for DB persistence | Saves to localStorage |
 
+## Deploy to Cloudflare (Workers + OpenNext)
+
+This app deploys to **Cloudflare Workers** via the OpenNext adapter
+(`@opennextjs/cloudflare`). A single Worker serves the static assets *and* runs
+the `/api/generate-kit` route — no separate Pages project needed.
+
+```bash
+# 1. Build the Worker bundle (runs `next build` + OpenNext bundling)
+npm run preview   # build + run locally on the Workers runtime
+
+# 2. Deploy (prompts a Cloudflare login the first time)
+npm run deploy
+```
+
+Config lives in `wrangler.jsonc` (assets binding + `nodejs_compat`) and
+`open-next.config.ts`.
+
+**Secrets / env vars:**
+
+- `OPENAI_API_KEY` is server-only. For local `npm run preview`, copy
+  `.dev.vars.example` to `.dev.vars`. For production, set it with:
+  ```bash
+  npx wrangler secret put OPENAI_API_KEY
+  ```
+- `NEXT_PUBLIC_*` vars are inlined at **build time** — set them in `.env.local`
+  before `npm run deploy`, not as Worker secrets.
+
+> Note: the OpenNext build is supported on macOS/Linux. On Windows, build via
+> WSL for reliable results (the adapter warns about native Windows).
+
+> Pinned to `@opennextjs/cloudflare@~1.15.1`, the last line that supports
+> Next.js 14. Upgrading to Next.js 15 unlocks newer adapter versions.
+
 ## How generation works
 
 - **Kit text** comes from OpenAI when `OPENAI_API_KEY` is set, otherwise from a

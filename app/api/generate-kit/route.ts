@@ -174,7 +174,9 @@ async function generateWithOpenAI(
   });
 
   if (!res.ok) return null;
-  const data = await res.json();
+  const data = (await res.json()) as {
+    choices?: Array<{ message?: { content?: unknown } }>;
+  };
   const content: unknown = data?.choices?.[0]?.message?.content;
   if (typeof content !== "string") return null;
   try {

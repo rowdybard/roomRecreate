@@ -6,3 +6,8 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// Enable Cloudflare bindings (env vars, etc.) when running `next dev` locally,
+// so the dev server matches the Workers runtime. No-op in production builds.
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();

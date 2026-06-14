@@ -66,7 +66,7 @@ function RecreateInner() {
         body: JSON.stringify(inputs),
       });
       if (!res.ok) throw new Error("bad status");
-      const data = await res.json();
+      const data = (await res.json()) as { kit?: RoomKit };
       if (data?.kit) return data.kit as RoomKit;
       throw new Error("no kit");
     } catch {

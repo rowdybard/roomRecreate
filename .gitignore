@@ -2,6 +2,11 @@
 /.next
 /out
 /build
+# OpenNext / Cloudflare build output + local secrets
+/.open-next
+.wrangler
+.dev.vars
+cloudflare-env.d.ts
 .DS_Store
 *.pem
 npm-debug.log*

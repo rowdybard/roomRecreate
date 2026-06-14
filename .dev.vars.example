@@ -1,0 +1,9 @@
+# Local Cloudflare Workers secrets for `npm run preview` (OpenNext).
+# Copy to `.dev.vars` and fill in what you want. All optional — the app runs without these.
+#
+# Server-only key used by /api/generate-kit. In production set it with:
+#   npx wrangler secret put OPENAI_API_KEY
+OPENAI_API_KEY=
+
+# NOTE: NEXT_PUBLIC_* vars are inlined at BUILD time, not read at runtime.
+# Set those in `.env.local` (for `next dev`/`next build`) — not here.

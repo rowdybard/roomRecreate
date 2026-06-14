@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "room-recreator",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-30",
+  // nodejs_compat is required by OpenNext + the /api/generate-kit Node runtime route.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Secrets (set with `npx wrangler secret put <NAME>`), all optional:
+  //   OPENAI_API_KEY
+  // Public build-time vars (NEXT_PUBLIC_*) are inlined at build time, not here.
+}
