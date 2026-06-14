@@ -114,17 +114,83 @@ export function generateLayout(
     const y = Math.max(3, Math.min(base.y, 95 - h));
     return {
       item: base.item,
-      x: Math.round(x),
-      y: Math.round(y),
-      w: Math.round(w),
-      h: Math.round(h),
+      x,
+      y,
+      w,
+      h,
       z: base.z ?? 1,
       model: modelFor(base.item),
       // FUTURE: drag-and-drop editor would let users override x/y/w/h here.
     };
   });
 
+  // Resolve overlaps so pieces never sit on top of each other, then snap to ints.
+  resolveOverlaps(layout);
+
   // Mark requested-but-default items so callers could highlight them later.
   void requested;
-  return layout;
+  return layout.map((it) => ({
+    ...it,
+    x: Math.round(it.x),
+    y: Math.round(it.y),
+    w: Math.round(it.w),
+    h: Math.round(it.h),
+  }));
+}
+
+const MARGIN = 2; // % inner room margin
+const GAP = 1.5; // min % gap between pieces
+
+/**
+ * Iterative separation pass. Flat floor coverings (rugs, z===0) are left in
+ * place and ignored — everything is allowed to sit on a rug. All other pieces
+ * are pushed apart along the axis of least penetration and clamped to the room.
+ */
+function resolveOverlaps(items: LayoutItem[]): void {
+  const movable = items.filter((it) => (it.z ?? 1) !== 0);
+
+  for (let pass = 0; pass < 24; pass++) {
+    let moved = false;
+    for (let i = 0; i < movable.length; i++) {
+      for (let j = i + 1; j < movable.length; j++) {
+        const a = movable[i];
+        const b = movable[j];
+
+        // Penetration depth on each axis (positive => overlapping).
+        const px =
+          Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) + GAP;
+        const py =
+          Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) + GAP;
+        if (px <= 0 || py <= 0) continue;
+
+        moved = true;
+        // Push the smaller-area piece more so anchors (bed/sofa) stay put.
+        const areaA = a.w * a.h;
+        const areaB = b.w * b.h;
+        const total = areaA + areaB;
+        const shareA = areaB / total; // a moves proportional to b's size
+        const shareB = areaA / total;
+
+        if (px < py) {
+          // Separate horizontally.
+          const dir = a.x <= b.x ? -1 : 1;
+          a.x += dir * px * shareA;
+          b.x -= dir * px * shareB;
+        } else {
+          // Separate vertically.
+          const dir = a.y <= b.y ? -1 : 1;
+          a.y += dir * py * shareA;
+          b.y -= dir * py * shareB;
+        }
+        clamp(a);
+        clamp(b);
+      }
+    }
+    if (!moved) break;
+  }
+}
+
+function clamp(it: LayoutItem): void {
+  it.x = Math.max(MARGIN, Math.min(it.x, 100 - MARGIN - it.w));
+  it.y = Math.max(MARGIN, Math.min(it.y, 100 - MARGIN - it.h));
 }

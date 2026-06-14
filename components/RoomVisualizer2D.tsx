@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { LayoutItem, PaletteColor } from "@/lib/types";
+import { blendHex, furnitureStyle } from "@/lib/furniture";
 
 type Props = {
   layout: LayoutItem[];
@@ -33,6 +34,19 @@ export function RoomVisualizer2D({ layout, palette, revealKey }: Props) {
 
   const floor = palette[0]?.hex ?? "#EFE6D8";
   const wall = palette[1]?.hex ?? "#D8C3A5";
+  const accent = palette[2]?.hex ?? palette[1]?.hex ?? "#B58B61";
+
+  // De-duplicated legend of the piece types actually placed.
+  const legend = useMemo(() => {
+    const seen = new Set<string>();
+    const out: { item: string; icon: string }[] = [];
+    for (const it of layout) {
+      if (seen.has(it.item)) continue;
+      seen.add(it.item);
+      out.push({ item: it.item, icon: furnitureStyle(it.item).icon });
+    }
+    return out;
+  }, [layout]);
 
   return (
     <div>
@@ -85,41 +99,68 @@ export function RoomVisualizer2D({ layout, palette, revealKey }: Props) {
 
         {mode === "styled" &&
           layout.map((it, i) => {
-            const color = palette[(i % (palette.length - 1)) + 1]?.hex ??
-              palette[0]?.hex ??
-              "#B58B61";
-            const isRug = it.item.toLowerCase().includes("rug");
+            const style = furnitureStyle(it.item);
+            const isRug = style.flat || it.item.toLowerCase().includes("rug");
+            // Blend the semantic tone slightly toward the kit accent so the
+            // plan stays on-theme without turning every block the same color.
+            const color = blendHex(style.tone, accent, 0.18);
             const show = i < revealed;
+            const small = it.w < 14 || it.h < 12;
             return (
               <div
                 key={it.item + i}
-                className="group absolute flex items-center justify-center rounded-2xl ring-1 ring-black/10 transition-all duration-500"
+                className="group absolute flex flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl ring-1 ring-black/10 transition-all duration-500"
                 style={{
                   left: `${it.x}%`,
                   top: `${it.y}%`,
                   width: `${it.w}%`,
                   height: `${it.h}%`,
                   backgroundColor: color,
-                  opacity: show ? (isRug ? 0.78 : 0.95) : 0,
+                  backgroundImage: isRug
+                    ? "repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 6px, rgba(0,0,0,0.05) 6px 12px)"
+                    : "linear-gradient(160deg, rgba(255,255,255,0.35), rgba(0,0,0,0.06))",
+                  opacity: show ? (isRug ? 0.85 : 1) : 0,
                   transform: show
                     ? "scale(1) translateY(0)"
-                    : "scale(0.8) translateY(8px)",
+                    : "scale(0.85) translateY(10px)",
                   boxShadow: isRug
-                    ? "inset 0 0 0 2px rgba(255,255,255,0.35)"
-                    : "0 8px 20px -8px rgba(60,40,20,0.4)",
+                    ? "inset 0 0 0 2px rgba(255,255,255,0.4)"
+                    : "0 10px 22px -10px rgba(60,40,20,0.55), inset 0 1px 0 rgba(255,255,255,0.4)",
                   zIndex: isRug ? 1 : 5 + i,
                 }}
                 title={it.item}
               >
-                <span className="pointer-events-none select-none rounded-full bg-black/0 px-2 text-center text-[10px] font-semibold leading-tight text-ink/80 transition group-hover:bg-white/70 sm:text-xs">
-                  {it.item}
+                <span
+                  className="pointer-events-none select-none leading-none drop-shadow-sm"
+                  style={{ fontSize: small ? "clamp(12px, 2.4vw, 20px)" : "clamp(16px, 3.2vw, 30px)" }}
+                  aria-hidden
+                >
+                  {style.icon}
                 </span>
+                {!small && (
+                  <span className="pointer-events-none max-w-[92%] select-none truncate rounded-full bg-white/85 px-2 py-0.5 text-center text-[10px] font-semibold leading-tight text-ink shadow-sm sm:text-xs">
+                    {it.item}
+                  </span>
+                )}
               </div>
             );
           })}
       </div>
-      <p className="mt-3 text-center text-xs text-cocoa/60">
-        A mini designer board — hover any piece to highlight it.
+
+      {/* Legend so every piece is identifiable, including tiny ones. */}
+      <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+        {legend.map((l) => (
+          <span
+            key={l.item}
+            className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-medium text-cocoa ring-1 ring-clay/20"
+          >
+            <span aria-hidden>{l.icon}</span>
+            {l.item}
+          </span>
+        ))}
+      </div>
+      <p className="mt-2 text-center text-xs text-cocoa/60">
+        A top-down designer board — toggle the empty room to compare.
       </p>
     </div>
   );
