@@ -30,7 +30,7 @@ without any of these.
 
 | Variable | Effect when set | When missing |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | `/api/generate-kit` uses OpenAI for kit text | Deterministic local generation |
+| `OPENAI_API_KEY` | `/api/generate-kit` uses OpenAI for kit text **and** `/api/restyle-room` enables the AI room restyle (gpt-image-1) | Kit text falls back to local generation; room restyle returns 503 |
 | `NEXT_PUBLIC_APP_URL` | Builds absolute share links | Relative share text |
 | `NEXT_PUBLIC_STRIPE_FULL_KIT_URL` | "Get Full Kit — $9" opens this link | Toast: "Checkout coming soon." |
 | `NEXT_PUBLIC_SUPABASE_URL` / `..._ANON_KEY` | Hook point for DB persistence | Saves to localStorage |

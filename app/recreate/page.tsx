@@ -15,6 +15,7 @@ import { BudgetPlan } from "@/components/BudgetPlan";
 import { DesignRules } from "@/components/DesignRules";
 import { SearchTerms } from "@/components/SearchTerms";
 import { DreamToRealSection } from "@/components/DreamToRealSection";
+import { RoomRestyler } from "@/components/RoomRestyler";
 import { ShareCard } from "@/components/ShareCard";
 import { EmailCapture } from "@/components/EmailCapture";
 import { LockedFullKit } from "@/components/LockedFullKit";
@@ -166,6 +167,11 @@ function RecreateInner() {
             The Studio
           </h1>
           <p className="section-lead">Describe the vibe. We&apos;ll style the room.</p>
+        </div>
+
+        {/* CORE FEATURE: restyle the user's real room photo from an inspiration board */}
+        <div className="mb-8">
+          <RoomRestyler />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
