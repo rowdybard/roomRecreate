@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { STYLE_DATA } from "@/lib/styles-data";
+import { HeroRoom3D } from "@/components/HeroRoom3D";
 
 export default function LandingPage() {
   return (
@@ -32,9 +33,9 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Floating preview mockup */}
+          {/* 3D room preview */}
           <div className="mx-auto mt-14 max-w-4xl">
-            <HeroMock />
+            <HeroRoom3D />
           </div>
         </div>
       </section>
@@ -59,7 +60,7 @@ export default function LandingPage() {
         lead="Not a spreadsheet — a mini designer board you can actually picture."
       >
         <div className="grid items-center gap-8 md:grid-cols-2">
-          <HeroMock />
+          <HeroRoom3D />
           <ul className="space-y-3">
             {[
               "Top-down room plan with labeled furniture",
@@ -210,40 +211,3 @@ function MiniCard({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-/** Static decorative top-down room mock used on the landing page. */
-function HeroMock() {
-  const blocks = [
-    { x: 14, y: 12, w: 44, h: 28, c: "#B58B61", label: "Bed" },
-    { x: 20, y: 48, w: 50, h: 28, c: "#D8C3A5", label: "Rug" },
-    { x: 66, y: 14, w: 12, h: 12, c: "#8A8F6A", label: "Table" },
-    { x: 80, y: 52, w: 9, h: 24, c: "#6B4F3A", label: "Mirror" },
-    { x: 7, y: 70, w: 10, h: 10, c: "#8A8F6A", label: "Plant" },
-  ];
-  return (
-    <div
-      className="relative w-full overflow-hidden rounded-xl3 shadow-soft ring-1 ring-white/60"
-      style={{
-        aspectRatio: "4 / 3",
-        background: "linear-gradient(160deg,#F4EBDD 0%,#EFE6D8 22%,#EFE6D8 100%)",
-      }}
-    >
-      <div className="pointer-events-none absolute inset-3 rounded-xl2 ring-2 ring-white/50" />
-      {blocks.map((b) => (
-        <div
-          key={b.label}
-          className="absolute flex items-center justify-center rounded-2xl text-[10px] font-semibold text-ink/70 ring-1 ring-black/10 sm:text-xs"
-          style={{
-            left: `${b.x}%`,
-            top: `${b.y}%`,
-            width: `${b.w}%`,
-            height: `${b.h}%`,
-            backgroundColor: b.c,
-            opacity: b.label === "Rug" ? 0.78 : 0.95,
-          }}
-        >
-          {b.label}
-        </div>
-      ))}
-    </div>
-  );
-}

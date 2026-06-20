@@ -15,3 +15,5 @@ yarn-error.log*
 .env
 .env*.local
 next-env.d.ts
+# Shared model cache (downloaded by scripts/download-models.mjs)
+/public/models/shared
