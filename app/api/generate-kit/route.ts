@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { serverEnv } from "@/lib/serverEnv";
 import { assembleKit, generateFallbackKit, generateKitText } from "@/lib/generateKit";
 import type { AiKitText, GenerateInputs, RoomKit } from "@/lib/types";
 import {
@@ -194,7 +195,7 @@ export async function POST(request: Request) {
     inputs = sanitizeInputs({});
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = await serverEnv("OPENAI_API_KEY", request);
   let kit: RoomKit;
   let source: "openai" | "local" = "local";
 

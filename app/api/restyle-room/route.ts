@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { serverEnv } from "@/lib/serverEnv";
 
 /**
  * POST /api/restyle-room  (multipart/form-data)
@@ -48,7 +49,7 @@ restyled to match the SECOND image. Strict rules:
 - Do not add text, logos, watermarks, or borders.`;
 
 export async function POST(request: Request) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = await serverEnv("OPENAI_API_KEY", request);
   if (!apiKey) {
     return NextResponse.json(
       {

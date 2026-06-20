@@ -1,6 +1,7 @@
 "use client";
 
 import type { RoomKit } from "@/lib/types";
+import { blendHex, furnitureStyle } from "@/lib/furniture";
 
 /**
  * WOW FACTOR 3: From Dream Pin to Real Room.
@@ -64,28 +65,38 @@ function Column({
 
 function MiniLayout({ kit }: { kit: RoomKit }) {
   const floor = kit.palette[0]?.hex ?? "#EFE6D8";
+  const accent = kit.palette[2]?.hex ?? kit.palette[1]?.hex ?? "#B58B61";
   return (
     <div
       className="relative w-full overflow-hidden rounded-xl ring-1 ring-black/5"
       style={{ aspectRatio: "4 / 3", backgroundColor: floor }}
     >
       {kit.layout.map((it, i) => {
-        const isRug = it.item.toLowerCase().includes("rug");
+        const style = furnitureStyle(it.item);
+        const isRug = style.flat || it.item.toLowerCase().includes("rug");
         return (
           <div
             key={i}
-            className="absolute rounded-md ring-1 ring-black/10"
+            className="absolute flex items-center justify-center rounded ring-1 ring-black/10"
             style={{
               left: `${it.x}%`,
               top: `${it.y}%`,
               width: `${it.w}%`,
               height: `${it.h}%`,
-              backgroundColor:
-                kit.palette[(i % (kit.palette.length - 1)) + 1]?.hex ?? "#B58B61",
-              opacity: isRug ? 0.7 : 0.95,
+              backgroundColor: blendHex(style.tone, accent, 0.18),
+              backgroundImage: isRug
+                ? "repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 5px, rgba(0,0,0,0.05) 5px 10px)"
+                : undefined,
+              opacity: isRug ? 0.75 : 0.98,
               zIndex: isRug ? 1 : 2,
             }}
-          />
+          >
+            {!isRug && (
+              <span className="select-none leading-none" style={{ fontSize: "clamp(8px, 1.6vw, 14px)" }} aria-hidden>
+                {style.icon}
+              </span>
+            )}
+          </div>
         );
       })}
     </div>

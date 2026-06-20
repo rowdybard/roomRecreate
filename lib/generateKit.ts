@@ -122,10 +122,10 @@ export function generateKitText(inputs: GenerateInputs): AiKitText {
   const merged = dedupe([...mustProducts, ...products]).slice(0, 7);
   const shoppingChecklist = adjForBudget(merged, inputs.budget);
 
-  const styleHex = style.palette[0].name.toLowerCase();
+  const styleColorName = style.palette[0].name.toLowerCase();
   const searchTerms = dedupe([
     `${inputs.style.toLowerCase()} ${roomWord}`,
-    `${styleHex} ${roomWord} decor`,
+    `${styleColorName} ${roomWord} decor`,
     ...merged.slice(0, 3).map((p) => `${inputs.style.toLowerCase()} ${p}`),
   ]).slice(0, 5);
 

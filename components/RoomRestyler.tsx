@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getDevKey } from "./DevKeyInput";
 import { useToast } from "./Toast";
 
 /**
@@ -71,7 +72,11 @@ export function RoomRestyler() {
       body.append("board", board.file, board.file.name);
       body.append("size", size);
 
-      const res = await fetch("/api/restyle-room", { method: "POST", body });
+      const res = await fetch("/api/restyle-room", {
+        method: "POST",
+        headers: getDevKey() ? { "x-openai-key": getDevKey()! } : undefined,
+        body,
+      });
       const data = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !data.image) {
         showToast(data.error || "Could not restyle the room.");

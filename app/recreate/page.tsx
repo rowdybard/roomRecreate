@@ -16,6 +16,7 @@ import { DesignRules } from "@/components/DesignRules";
 import { SearchTerms } from "@/components/SearchTerms";
 import { DreamToRealSection } from "@/components/DreamToRealSection";
 import { RoomRestyler } from "@/components/RoomRestyler";
+import { DevKeyInput, getDevKey } from "@/components/DevKeyInput";
 import { ShareCard } from "@/components/ShareCard";
 import { EmailCapture } from "@/components/EmailCapture";
 import { LockedFullKit } from "@/components/LockedFullKit";
@@ -63,7 +64,10 @@ function RecreateInner() {
     try {
       const res = await fetch("/api/generate-kit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(getDevKey() ? { "x-openai-key": getDevKey()! } : {}),
+        },
         body: JSON.stringify(inputs),
       });
       if (!res.ok) throw new Error("bad status");
@@ -162,11 +166,14 @@ function RecreateInner() {
     <>
       <Nav />
       <main className="mx-auto max-w-6xl px-5 pb-16 pt-10">
-        <div className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
-            The Studio
-          </h1>
-          <p className="section-lead">Describe the vibe. We&apos;ll style the room.</p>
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="font-serif text-3xl font-semibold tracking-tight md:text-4xl">
+              The Studio
+            </h1>
+            <p className="section-lead">Describe the vibe. We&apos;ll style the room.</p>
+          </div>
+          <DevKeyInput />
         </div>
 
         {/* CORE FEATURE: restyle the user's real room photo from an inspiration board */}
